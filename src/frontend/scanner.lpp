@@ -1,0 +1,76 @@
+%{
+
+#include "frontend.hpp"
+
+extern int yylineno;
+int comment = 0;
+
+int print_tok = 0;
+
+extern "C" int yywrap(void) { return 1; }
+
+%}
+
+%option yylineno
+%option nounput
+
+D			[0-9]
+L			[a-zA-Z_]
+SPACE		[ \t]
+
+%%
+
+\n              { comment = 0; }
+"#"             { comment = 1; }
+"//"            { comment = 1; }
+"equation"      { if (!comment) { if (print_tok) std::cout << "KW_EQ"   << '\n';
+                                  return KW_EQ;} }
+"bc"            { if (!comment) { if (print_tok) std::cout << "KW_BC"   << '\n';
+                                  return KW_BC;} }
+"ic"            { if (!comment) { if (print_tok) std::cout << "KW_IC"   << '\n';
+                                  return KW_IC;} }
+"center"        { if (!comment) { if (print_tok) std::cout << "KW_LOC"  << '\n';
+                                  yylval.int_val = ir::CENTER; return KW_LOC;} }
+"surface"       { if (!comment) { if (print_tok) std::cout << "KW_LOC"  << '\n';
+                                  yylval.int_val = ir::SURFACE;return KW_LOC;} }
+"top"           { if (!comment) { if (print_tok) std::cout << "KW_LOC"  << '\n';
+                                  yylval.int_val = ir::TOP; return KW_LOC;} }
+"bottom"        { if (!comment) { if (print_tok) std::cout << "KW_LOC"  << '\n';
+                                  yylval.int_val = ir::BOTTOM; return KW_LOC;} }
+"sin"           { if (!comment) { if (print_tok) std::cout << "KW_SIN"  << '\n';
+                                  return KW_SIN;} }
+"cos"           { if (!comment) { if (print_tok) std::cout << "KW_COS"  << '\n';
+                                  return KW_COS;} }
+"div"           { if (!comment) { if (print_tok) std::cout << "KW_DIV"  << '\n';
+                                  return KW_DIV;} }
+"grad"          { if (!comment) { if (print_tok) std::cout << "KW_GRAD" << '\n';
+                                  return KW_GRAD;} }
+"lap"           { if (!comment) { if (print_tok) std::cout << "KW_LAP"  << '\n';
+                                  return KW_LAP;} }
+"var"           { if (!comment) { if (print_tok) std::cout << "KW_VAR"  << '\n';
+                                  return KW_VAR;} }
+"real"          { if (!comment) { if (print_tok) std::cout << "KW_REAL" << '\n';
+                                  return KW_REAL;} }
+"field"         { if (!comment) { if (print_tok) std::cout << "KW_FIELD" << '\n';
+                                  return KW_FIELD;} }
+"let"           { if (!comment) { if (print_tok) std::cout << "KW_TYPE" << '\n';
+                                  return KW_LET;} }
+{L}({L}|{D})*   { if (!comment) { yylval.str = new std::string(yytext);
+                                  if (print_tok) std::cout << "id: "
+                                                    << yytext << '\n';
+                                  return ID;} }
+{D}+            { if (!comment) { if (print_tok) std::cout << "INT_VALUE: "
+                                                    << yytext << '\n';
+                                  yylval.int_val = atoi(yytext); return INT_VALUE;} }
+{D}*\.{D}+      { if (!comment) { if (print_tok) std::cout << "REAL: "
+                                                    << yytext << '\n';
+                                  yylval.real_val = atof(yytext); return REAL_VALUE;} }
+{D}+\.{D}*      { if (!comment) { if (print_tok) std::cout << "REAL: "
+                                                    << yytext << '\n';
+                                  yylval.real_val = atof(yytext); return REAL_VALUE;} }
+{SPACE}         { /* DO NOTHING	*/ }
+.               { if (!comment) { if (print_tok) std::cout << "CHAR: "
+                                                    << yytext[0] << '\n';
+                                  return yytext[0];} }
+
+%%

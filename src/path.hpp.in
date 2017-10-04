@@ -1,0 +1,8 @@
+#ifndef PATH_H
+#define PATH_H
+
+#include <string>
+
+#define ABS_TOP_SRCDIR std::string("@abs_top_srcdir@")
+
+#endif
