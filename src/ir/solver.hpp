@@ -5,6 +5,7 @@
 #include "path.hpp"
 
 #include <fstream>
+#include <map>
 
 namespace ir {
 
@@ -37,7 +38,7 @@ class solver {
         solver() { }
         ~solver() { vars.clear(); }
 
-        int addvar(std::shared_ptr<const variable> var) {
+        int add_var(std::shared_ptr<const variable> var) {
             for (auto v: vars) {
                 if (v->name == var->name) {
                     return 1;
@@ -47,7 +48,11 @@ class solver {
             return 0;
         }
 
-        void addeq(std::shared_ptr<const equation> eq) {
+        void add_param(const std::string& name, const std::string& type) {
+            params[name] = type;
+        }
+
+        void add_eq(std::shared_ptr<const equation> eq) {
             eqs.push_back(eq);
         }
 
@@ -75,9 +80,12 @@ class solver {
 
         void emit_code(std::ostream& os) {
             os << "#include <ester.h>\n\n";
-            log::warn() << "Ad Hoc declaration of n (polytropic index)\n";
-            os << "double n = 1.5;\n";
             write_template_file(os, "mapping.cpp");
+
+            for (auto p: params) {
+                os << p.second << " " << p.first << ";\n";
+            }
+
             emit_solver(os);
         }
 
@@ -511,7 +519,11 @@ class solver {
                     os << "sym_" << id->name;
                 }
                 else {
-                    os << id->name;
+                    if (is_param(id->name) || is_var(id->name))
+                        os << id->name;
+                    else {
+                        error("Undefined identifier " + id->name);
+                    }
                 }
             }
             else if (auto lap = dynamic_cast<const lap_expr *>(e)) {
@@ -541,6 +553,13 @@ class solver {
                 expr.display("Term skipped");
                 error("Term skipped");
             }
+        }
+
+        bool is_param(const std::string& name) {
+            for (auto p: params) {
+                if (p.first == name) return true;
+            }
+            return false;
         }
 
         bool is_var(const std::string& name) {
@@ -655,6 +674,8 @@ class solver {
     private:
         std::vector<std::shared_ptr<const ir::variable>> vars; 
         std::vector<std::shared_ptr<const ir::equation>> eqs; 
+
+        std::map<std::string, std::string> params; 
 };
 
 }

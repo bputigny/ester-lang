@@ -39,6 +39,7 @@ static int nbc = 0;
 %token KW_SIN KW_COS KW_DIV KW_GRAD KW_LAP
 %token KW_BC KW_IC KW_EQ
 %token KW_REAL KW_FIELD
+%token KW_DOUBLE KW_MATRIX
 
 %type <expr> expr factor unary_expr postfix_expr primary_expr
 %type <id_lst> id_lst
@@ -64,7 +65,7 @@ variable_definition
 : KW_VAR type ':' id_lst    { for (auto id: *$4) {
                                   std::shared_ptr<ir::variable> var;
                                   var = std::make_shared<ir::variable>(id->name, $2);
-                                  if (solver->addvar(var)) {
+                                  if (solver->add_var(var)) {
                                       std::string msg = "var "
                                         + id->name
                                         + " already defined";
@@ -81,8 +82,8 @@ type
 ;
 
 declarations
-: declaration               { yyerror(solver, "declarations not yet implemented"); YYABORT; }
-| declaration declarations  { yyerror(solver, "declarations not yet implemented"); YYABORT; }
+: declaration               { }
+| declaration declarations  { }
 ;
 
 declaration
@@ -90,6 +91,8 @@ declaration
                                  << ":" << yylineno
                                  << ": Definitions not yet implemented\n";
                               delete $4; }
+| KW_DOUBLE ID              { solver->add_param(*$2, std::string("double")); }
+| KW_MATRIX ID              { solver->add_param(*$2, std::string("matrix")); }
 ;
 
 expr
@@ -165,8 +168,8 @@ id_lst
 ;
 
 equations
-: equation                  { solver->addeq(std::shared_ptr<const ir::equation>($1)); }
-| equation equations        { solver->addeq(std::shared_ptr<const ir::equation>($1)); }
+: equation                  { solver->add_eq(std::shared_ptr<const ir::equation>($1)); }
+| equation equations        { solver->add_eq(std::shared_ptr<const ir::equation>($1)); }
 ;
 
 equation

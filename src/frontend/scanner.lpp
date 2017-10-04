@@ -49,6 +49,10 @@ SPACE		[ \t]
                                   return KW_LAP;} }
 "var"           { if (!comment) { if (print_tok) std::cout << "KW_VAR"  << '\n';
                                   return KW_VAR;} }
+"double"        { if (!comment) { if (print_tok) std::cout << "KW_DOUBLE" << '\n';
+                                  return KW_DOUBLE;} }
+"matrix"        { if (!comment) { if (print_tok) std::cout << "KW_MATRIX" << '\n';
+                                  return KW_MATRIX;} }
 "real"          { if (!comment) { if (print_tok) std::cout << "KW_REAL" << '\n';
                                   return KW_REAL;} }
 "field"         { if (!comment) { if (print_tok) std::cout << "KW_FIELD" << '\n';

@@ -1,8 +1,7 @@
 var field: Phi
 var real: Lambda, Phi0
 
-// input real n
-// let p = phi
+double n
 
 equation Phi {
     lap(Phi) = pow(1 - Lambda * (Phi-Phi0), n)
