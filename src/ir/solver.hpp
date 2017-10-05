@@ -83,7 +83,7 @@ class solver {
             write_template_file(os, "mapping.cpp");
 
             for (auto p: params) {
-                os << p.second << " " << p.first << ";\n";
+                os << "extern " << p.second << " " << p.first << ";\n";
             }
 
             emit_solver(os);

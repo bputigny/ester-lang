@@ -7,6 +7,7 @@ extern solver *create_solver();
 matrix Phi;
 matrix Phi0;
 matrix Lambda;
+double n = 1.5;
 
 int main(int argc, char *arg[]) {
     int it = 0;

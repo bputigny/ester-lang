@@ -68,7 +68,7 @@ AC_CONFIG_FILES([Makefile
                  src/ir/Makefile
                  src/utils/Makefile
                  src/frontend/Makefile
-                 ])
+                 samples/Makefile])
 
 AC_ARG_ENABLE([debug],
               AS_HELP_STRING([--enable-debug],
@@ -80,6 +80,14 @@ AS_IF([test "x$enable_debug" = "xyes"],
       CPPFLAGS="$CPPFLAGS -DNDEBUG=1"
       debug="no"])
 
+AC_CHECK_HEADER([ester.h],
+                [AC_SEARCH_LIBS([ester_version], [ester],
+                                [have_libester=yes],
+                                [have_libester=no])],
+                [have_libester=no])
+
+AM_CONDITIONAL([BUILD_SAMPLES], [test x$have_libester = xyes])
+
 AC_OUTPUT
 
 cat << EOF
@@ -90,5 +98,6 @@ CXX:        $CXX
 CXXFLAGS:   $CXXFLAGS
 CPPFLAGS:   $CPPFLAGS
 DEBUG:      $debug
+LIBESTER:   $have_libester
 
 EOF
