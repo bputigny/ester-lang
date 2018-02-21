@@ -1,4 +1,6 @@
 #include <ester.h>
+#include <matplotlib.h>
+
 #include <iomanip>
 
 extern void create_map(mapping& map);
@@ -49,17 +51,19 @@ int main(int argc, char *arg[]) {
         return 1;
     }
 
-    figure fig("/XSERVE");
-    fig.subplot(2, 1);
+    plt::init();
+    plt::subplot(211);
 
-    fig.plot(map.r, Phi);
-    fig.label("r", "Phi", "");
+    plt::plot(map.r, Phi, "$\\Phi$");
+    plt::legend();
 
     matrix error_matrix(errors.size(), 1);
     for (size_t i=0; i<errors.size(); i++)
         error_matrix(i) = errors[i];
-    fig.plot(error_matrix);
-    fig.label("iteration", "Error", "");
+
+    plt::subplot(212);
+    plt::plot(error_matrix, "Error");
+    plt::legend();
 
     printf("\n");
     printf("Lambda = %f\n", Lambda(0));
@@ -69,5 +73,6 @@ int main(int argc, char *arg[]) {
     printf("  dPhi/dr(0) = %e\n", (map.D, Phi)(0));
     printf("  dPhi/dr(1) + Phi(1) = %e\n", (map.D, Phi)(-1)+Phi(-1));
 
+    plt::show(true);
     return 0;
 }
